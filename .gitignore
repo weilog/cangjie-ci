@@ -1,0 +1,6 @@
+target/
+.cangjie-sdk/
+.sdk/
+*.exe
+*.bc
+*.o
