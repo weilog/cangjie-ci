@@ -1,0 +1,31 @@
+name: Cangjie Unit Test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Run Cangjie unit tests
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download Cangjie SDK
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $sdkUrl = "https://github.com/${{ github.repository }}/releases/download/cangjie-sdk-1.0.5/cangjie-sdk-windows-x64-1.0.5.zip"
+          New-Item -ItemType Directory -Force -Path ".sdk" | Out-Null
+          Invoke-WebRequest -Uri $sdkUrl -OutFile ".sdk/cangjie-sdk-windows-x64-1.0.5.zip"
+
+      - name: Run unit tests
+        shell: pwsh
+        run: |
+          .\.ci\run-tests-windows.ps1 -SdkZip ".sdk\cangjie-sdk-windows-x64-1.0.5.zip" -SdkRoot ".sdk"
