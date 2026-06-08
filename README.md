@@ -9,6 +9,7 @@ This project demonstrates a Cangjie unit test environment running in a CI/CD pip
 - Runner: `windows-latest`
 - Cangjie SDK: `cangjie-sdk-windows-x64-1.0.5.zip`
 - SDK release tag: `cangjie-sdk-1.0.5`
+- SDK release asset: verified reachable on 2026-06-08
 
 The SDK is stored as a GitHub Release asset instead of being committed to the repository.
 
