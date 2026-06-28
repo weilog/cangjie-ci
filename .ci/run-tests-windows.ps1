@@ -55,6 +55,9 @@ if (-not (Test-Path $TestExe)) {
     } else {
         throw "Expected test executable was not created: $OutputBase or $WindowsExe"
     }
+} elseif (-not (Test-Path "$OutputBase.exe")) {
+    Copy-Item -Path $OutputBase -Destination "$OutputBase.exe" -Force
+    $TestExe = "$OutputBase.exe"
 }
 
 Write-Host "Running unit test..."
