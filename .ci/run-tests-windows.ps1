@@ -47,9 +47,14 @@ $TestFile = Join-Path $ProjectRoot "tests\add_test.cj"
 Write-Host "Compiling unit test..."
 cjc $SourceFile $TestFile --test -o $OutputBase
 
-$TestExe = "$OutputBase.exe"
+$TestExe = $OutputBase
 if (-not (Test-Path $TestExe)) {
-    throw "Expected test executable was not created: $TestExe"
+    $WindowsExe = "$OutputBase.exe"
+    if (Test-Path $WindowsExe) {
+        $TestExe = $WindowsExe
+    } else {
+        throw "Expected test executable was not created: $OutputBase or $WindowsExe"
+    }
 }
 
 Write-Host "Running unit test..."
