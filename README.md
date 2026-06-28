@@ -4,18 +4,17 @@ This project demonstrates a Cangjie unit test environment running in a CI/CD pip
 
 ## CI/CD Platform
 
-- Repository: https://github.com/weilog/cangjie-ci
-- Pipeline: GitHub Actions
-- Runner: `windows-latest`
+- Primary pipeline: Jenkins local pipeline
+- Jenkins pipeline file: `Jenkinsfile`
+- Runner: local Windows machine
 - Cangjie SDK: `cangjie-sdk-windows-x64-1.0.5.zip`
-- SDK release tag: `cangjie-sdk-1.0.5`
-- SDK release asset: verified reachable on 2026-06-08
 
-The SDK is stored as a GitHub Release asset instead of being committed to the repository.
+GitHub Actions was also prepared, but the GitHub-hosted runner could not start because the account was locked by a billing issue. Jenkins is used as the final CI/CD platform because it does not require GitHub-hosted runner billing.
 
 ## Project Structure
 
 ```text
+Jenkinsfile
 src/add.cj
 tests/add_test.cj
 .ci/run-tests-windows.ps1
@@ -32,21 +31,36 @@ Run the unit test with the local SDK zip:
 
 The script extracts the SDK, loads `envsetup.ps1`, prints `cjc -v`, compiles the unit test, and runs the generated test executable.
 
-## GitHub Actions Test
+## Jenkins Pipeline Test
 
-The workflow runs on `push`, `pull_request`, and `workflow_dispatch`.
-
-It downloads the SDK from:
+Create a Jenkins Pipeline job and point it at this project. The pipeline reads `Jenkinsfile` and runs these stages:
 
 ```text
-https://github.com/weilog/cangjie-ci/releases/download/cangjie-sdk-1.0.5/cangjie-sdk-windows-x64-1.0.5.zip
+Check workspace
+Check Cangjie SDK
+Run Cangjie unit tests
+Archive target artifacts
 ```
 
-Then it compiles and runs:
+The default SDK path in `Jenkinsfile` is:
+
+```text
+C:\Users\cdk\Downloads\cangjie-sdk-windows-x64-1.0.5.zip
+```
+
+The test stage compiles and runs:
 
 ```powershell
 cjc src\add.cj tests\add_test.cj --test -o target\add_test
-.\target\add_test.exe
+.\target\add_test
 ```
 
-To verify the automated test, open the repository's Actions tab and check the latest `Cangjie Unit Test` workflow run.
+To verify the automated test, open the Jenkins build page and check the console output. A successful run should show `Cangjie Compiler: 1.0.5 (cjnative)`, then compile and run the unit test.
+
+## GitHub Actions Note
+
+The repository still contains `.github/workflows/cangjie-unit-test.yml` as an alternative CI configuration. It is not the final selected platform because GitHub returned:
+
+```text
+The job was not started because your account is locked due to a billing issue.
+```
