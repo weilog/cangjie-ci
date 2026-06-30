@@ -32,11 +32,20 @@ pipeline {
                 '''
             }
         }
+
+        stage('Package delivery artifact') {
+            steps {
+                powershell '''
+                    $ErrorActionPreference = "Stop"
+                    .\\.ci\\package-delivery.ps1
+                '''
+            }
+        }
     }
 
     post {
         always {
-            archiveArtifacts artifacts: 'target/**', allowEmptyArchive: true
+            archiveArtifacts artifacts: 'target/**, dist/**', allowEmptyArchive: true
         }
     }
 }
