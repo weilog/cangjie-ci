@@ -1,6 +1,6 @@
-# Cangjie CI Homework
+# Cangjie CI/CD Homework
 
-This project demonstrates a Cangjie unit test environment running in a CI/CD pipeline.
+This project demonstrates a Cangjie unit test CI/CD pipeline with Jenkins.
 
 ## CI/CD Platform
 
@@ -18,10 +18,11 @@ Jenkinsfile
 src/add.cj
 tests/add_test.cj
 .ci/run-tests-windows.ps1
+.ci/package-delivery.ps1
 .github/workflows/cangjie-unit-test.yml
 ```
 
-## Local Test
+## Local CI Test
 
 Run the unit test with the local SDK zip:
 
@@ -31,31 +32,42 @@ Run the unit test with the local SDK zip:
 
 The script extracts the SDK, loads `envsetup.ps1`, prints `cjc -v`, compiles the unit test, and runs the generated test executable.
 
-## Jenkins Pipeline Test
+## Local CD Packaging
 
-Create a Jenkins Pipeline job and point it at this project. The pipeline reads `Jenkinsfile` and runs these stages:
+After the test passes, generate a delivery package:
+
+```powershell
+.\.ci\package-delivery.ps1
+```
+
+The CD step creates:
+
+```text
+dist/cangjie-ci-homework.zip
+```
+
+## Jenkins CI/CD Flow
+
+Create a Jenkins job and point it at this project. The pipeline has these stages:
 
 ```text
 Check workspace
 Check Cangjie SDK
 Run Cangjie unit tests
-Archive target artifacts
+Package delivery artifact
+Archive target and dist artifacts
 ```
 
-The default SDK path in `Jenkinsfile` is:
-
-```text
-C:\Users\cdk\Downloads\cangjie-sdk-windows-x64-1.0.5.zip
-```
-
-The test stage compiles and runs:
+The CI stage compiles and runs:
 
 ```powershell
 cjc src\add.cj tests\add_test.cj --test -o target\add_test
-.\target\add_test
+.\target\add_test.exe
 ```
 
-To verify the automated test, open the Jenkins build page and check the console output. A successful run should show `Cangjie Compiler: 1.0.5 (cjnative)`, then compile and run the unit test.
+The CD stage packages the tested source, scripts, and generated test artifacts into `dist/cangjie-ci-homework.zip`.
+
+To verify the automated CI/CD result, open the Jenkins build page and check the console output. A successful run should show `Cangjie Compiler: 1.0.5 (cjnative)`, `Delivery package created`, and `Finished: SUCCESS`.
 
 ## GitHub Actions Note
 
