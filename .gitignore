@@ -1,4 +1,5 @@
 target/
+dist/
 .cangjie-sdk/
 .sdk/
 *.exe
